@@ -9,34 +9,50 @@ RELEASE_FLAGS := -O2 -DNDEBUG
 
 INCLUDES := -Iinclude
 
-SRCDIR := src
-BUILDDIR := build
+SRC_DIR := src
+BUILD_DIR := build
+BUILD_DEBUG_DIR := $(BUILD_DIR)/debug
+BUILD_RELEASE_DIR := $(BUILD_DIR)/release
 
-SRC := $(wildcard $(SRCDIR)/*.c)
-OBJ := $(SRC:$(SRCDIR)/%.c=$(BUILDDIR)/%.o)
+SRC := $(wildcard $(SRC_DIR)/*.c)
+OBJ_DEBUG := $(SRC:$(SRC_DIR)/%.c=$(BUILD_DEBUG_DIR)/%.o)
+OBJ_RELEASE := $(SRC:$(SRC_DIR)/%.c=$(BUILD_RELEASE_DIR)/%.o)
 
-TARGET=$(BUILDDIR)/mgit
+TARGET_DEBUG=$(BUILD_DEBUG_DIR)/mgit
+TARGET_RELEASE=$(BUILD_RELEASE_DIR)/mgit
 
 ######################################### RECIPES #########################################
 
 all: debug
 
 debug: CFLAGS += $(DEBUG_FLAGS)
-debug: $(TARGET)
+debug: $(TARGET_DEBUG)
 
 release: CFLAGS += $(RELEASE_FLAGS)
-release: $(TARGET)
+release: $(TARGET_RELEASE)
 
-$(TARGET): $(OBJ)
+$(TARGET_DEBUG): $(OBJ_DEBUG) | $(BUILD_DEBUG_DIR)
 	$(CC) $(CFLAGS) $^ -o $@
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR)
+$(TARGET_RELEASE): $(OBJ_RELEASE) | $(BUILD_RELEASE_DIR)
+	$(CC) $(CFLAGS) $^ -o $@
+
+$(BUILD_DEBUG_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DEBUG_DIR)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-$(BUILDDIR):
-	mkdir -p $(BUILDDIR)
+$(BUILD_RELEASE_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_RELEASE_DIR)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+$(BUILD_DEBUG_DIR): $(BUILD_DIR)
+	mkdir -p $(BUILD_DEBUG_DIR)
+
+$(BUILD_RELEASE_DIR): $(BUILD_DIR)
+	mkdir -p $(BUILD_RELEASE_DIR)
 
 clean:
-	rm -rf $(BUILDDIR)
+	rm -rf $(BUILD_DIR)
 
 .PHONY: all debug release clean build
