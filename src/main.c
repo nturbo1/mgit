@@ -1,17 +1,16 @@
 #include <stdio.h>
+
 #include "logger.h"
+
+#include "init.h"
+#include "parser.h"
 
 int main(int argc, char* argv[])
 {
-    printf("argc: %d\n", argc);
-    printf("argv[0]: %s\n", argv[0]);
+    mgitcmd_t cmd = parse(argc, argv);
+    LOG_DEBUG("Parsed command: %s", cmd.name);
 
-    LOG_FIXME("Logging fixme!", NULL);
-    LOG_DEBUG("Logging debug!", NULL);
-    LOG_INFO("Logging info!", NULL);
-    LOG_WARN("Logging warn!", NULL);
-    LOG_ERROR("Logging error!", NULL);
-    LOG_FATAL("Logging fatal!", NULL);
+    init();
 
     return 0;
 }
